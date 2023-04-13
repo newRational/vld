@@ -3,6 +3,7 @@ package vld
 import (
 	"github.com/pkg/errors"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -174,6 +175,11 @@ func validateStr(f reflect.StructField, str string) error {
 
 			if !in {
 				return errors.Errorf("%v: value is not in %v", f.Name, strs)
+			}
+		case "email":
+			matched, _ := regexp.MatchString("^[A-Z0-9._%+-]+@[A-Z0-9-]+.+.[A-Z]{2,4}$", tv)
+			if !matched {
+				return errors.Errorf("%v: value is not email address", f.Name)
 			}
 		}
 	}
