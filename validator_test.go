@@ -106,6 +106,7 @@ func TestValidate(t *testing.T) {
 					MaxInt    int64  `validate:"max:20"`
 					MaxIntNeg int64  `validate:"max:-2"`
 					MaxStr    string `validate:"max:20"`
+					EmailStr  string `validate:"email"`
 				}{
 					Len:       "abcdefghjklmopqrstvu",
 					LenZ:      "",
@@ -119,6 +120,7 @@ func TestValidate(t *testing.T) {
 					MaxInt:    16,
 					MaxIntNeg: -3,
 					MaxStr:    "abcdefghjklmopqrst",
+					EmailStr:  "jenny@gmail.com",
 				},
 			},
 			wantErr: false,
@@ -342,6 +344,23 @@ func TestValidate(t *testing.T) {
 			wantErr: true,
 			checkErr: func(err error) bool {
 				assert.Len(t, err.(ValidationErrors), 6)
+				return true
+			},
+		},
+		{
+			name: "wrong email",
+			args: args{
+				v: struct {
+					EmailStr1 string `validate:"email"`
+					EmailStr2 string `validate:"email"`
+				}{
+					EmailStr1: "invalid_email",
+					EmailStr2: "",
+				},
+			},
+			wantErr: true,
+			checkErr: func(err error) bool {
+				assert.Len(t, err.(ValidationErrors), 2)
 				return true
 			},
 		},

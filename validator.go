@@ -1,6 +1,7 @@
 package vld
 
 import (
+	"fmt"
 	"github.com/pkg/errors"
 	"reflect"
 	"regexp"
@@ -80,15 +81,14 @@ func validate(f reflect.StructField, v reflect.Value) error {
 
 func validateInt(f reflect.StructField, num int64) error {
 	conditions := strings.Split(f.Tag.Get("validate"), ";")
-	var tk, tv string
+	var params []string
 
 	for _, c := range conditions {
-		tk = strings.Split(c, ":")[0]
-		tv = strings.Split(c, ":")[1]
+		params = strings.Split(c, ":")
 
-		switch tk {
+		switch params[0] {
 		case "min":
-			min, err := strconv.Atoi(tv)
+			min, err := strconv.Atoi(params[1])
 			if err != nil {
 				return ErrInvalidValidatorSyntax
 			}
@@ -96,7 +96,7 @@ func validateInt(f reflect.StructField, num int64) error {
 				return errors.Errorf("%v: value is less than %v", f.Name, min)
 			}
 		case "max":
-			max, err := strconv.Atoi(tv)
+			max, err := strconv.Atoi(params[1])
 			if err != nil {
 				return ErrInvalidValidatorSyntax
 			}
@@ -105,7 +105,7 @@ func validateInt(f reflect.StructField, num int64) error {
 			}
 		case "in":
 			var in bool
-			nums := strings.Split(tv, ",")
+			nums := strings.Split(params[1], ",")
 
 			for _, n := range nums {
 				i, err := strconv.Atoi(n)
@@ -128,15 +128,14 @@ func validateInt(f reflect.StructField, num int64) error {
 
 func validateStr(f reflect.StructField, str string) error {
 	conditions := strings.Split(f.Tag.Get("validate"), ";")
-	var tk, tv string
+	var params []string
 
 	for _, c := range conditions {
-		tk = strings.Split(c, ":")[0]
-		tv = strings.Split(c, ":")[1]
+		params = strings.Split(c, ":")
 
-		switch tk {
+		switch params[0] {
 		case "len":
-			l, err := strconv.Atoi(tv)
+			l, err := strconv.Atoi(params[1])
 			if err != nil {
 				return ErrInvalidValidatorSyntax
 			}
@@ -144,7 +143,7 @@ func validateStr(f reflect.StructField, str string) error {
 				return errors.Errorf("%v: len is not equal to %v", f.Name, l)
 			}
 		case "min":
-			min, err := strconv.Atoi(tv)
+			min, err := strconv.Atoi(params[1])
 			if err != nil {
 				return ErrInvalidValidatorSyntax
 			}
@@ -152,7 +151,7 @@ func validateStr(f reflect.StructField, str string) error {
 				return errors.Errorf("%v: len is less than %v", f.Name, min)
 			}
 		case "max":
-			max, err := strconv.Atoi(tv)
+			max, err := strconv.Atoi(params[1])
 			if err != nil {
 				return ErrInvalidValidatorSyntax
 			}
@@ -161,9 +160,9 @@ func validateStr(f reflect.StructField, str string) error {
 			}
 		case "in":
 			var in bool
-			strs := strings.Split(tv, ",")
+			strs := strings.Split(params[1], ",")
 
-			if len(tv) == 0 {
+			if len(params[1]) == 0 {
 				return errors.Errorf("%v: value is not in empty %v", f.Name, strs)
 			}
 
@@ -177,8 +176,10 @@ func validateStr(f reflect.StructField, str string) error {
 				return errors.Errorf("%v: value is not in %v", f.Name, strs)
 			}
 		case "email":
-			matched, _ := regexp.MatchString("^[A-Z0-9._%+-]+@[A-Z0-9-]+.+.[A-Z]{2,4}$", tv)
+			r, _ := regexp.Compile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+			matched := r.MatchString(str)
 			if !matched {
+				fmt.Println("email:", str)
 				return errors.Errorf("%v: value is not email address", f.Name)
 			}
 		}
