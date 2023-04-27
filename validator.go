@@ -179,7 +179,6 @@ func validateStr(f reflect.StructField, str string) error {
 			r, _ := regexp.Compile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 			matched := r.MatchString(str)
 			if !matched {
-				fmt.Println("email:", str)
 				return errors.Errorf("%v: value is not email address", f.Name)
 			}
 		}
