@@ -1,12 +1,12 @@
 package vld
 
 import (
-	"fmt"
-	"github.com/pkg/errors"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 var ErrNotStruct = errors.New("wrong argument given, should be a struct")
